@@ -9,9 +9,11 @@
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { useParams } from "wouter";
-import wretch from "wretch";
 
+import { api } from "../../app/api/api.ts";
+import { Loader } from "../../app/layout/Loader.tsx";
 import { Product } from "../../app/models/product.ts";
 
 export function ProductDetails() {
@@ -20,17 +22,15 @@ export function ProductDetails() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function getProduct() {
-      await wretch(`/api/products/${id}`)
-        .get()
-        .json((p) => setProduct(p))
-        .finally(() => setLoading(false));
-    }
-    getProduct().then();
+    api.product
+      .get(Number.parseInt(id, 10))
+      .then((response) => setProduct(response as Product))
+      .catch((error) => toast.error(error.json.title))
+      .finally(() => setLoading(false));
   }, [id]);
 
   if (loading) {
-    return <Typography variant="h2">Loading...</Typography>;
+    return <Loader message="Loading product..." />;
   }
 
   if (!product) {
