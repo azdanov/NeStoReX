@@ -3,7 +3,7 @@
 import { Product } from "../../app/models/product.ts";
 import { ProductGrid } from "./ProductGrid.tsx";
 
-export function Catalog() {
+export function ProductPage() {
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {

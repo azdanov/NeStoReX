@@ -8,6 +8,7 @@
   CardMedia,
   Typography,
 } from "@mui/material";
+import { Link } from "wouter";
 
 import { Product } from "../../app/models/product.ts";
 
@@ -48,7 +49,9 @@ export function ProductCard({ product }: Props) {
       </CardContent>
       <CardActions>
         <Button size="small">Add to cart</Button>
-        <Button size="small">View</Button>
+        <Button component={Link} size="small" to={`/products/${product.id}`}>
+          View
+        </Button>
       </CardActions>
     </Card>
   );

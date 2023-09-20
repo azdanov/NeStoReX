@@ -16,7 +16,9 @@
     "@mui/icons-material": "^5.14.9",
     "@mui/material": "^5.14.10",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "wouter": "^2.12.0-beta.1",
+    "wretch": "^2.7.0"
   },
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.5.1",
