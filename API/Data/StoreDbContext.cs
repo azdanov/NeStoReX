@@ -11,6 +11,8 @@ public class StoreDbContext : DbContext
     }
 
     public DbSet<Product> Products { get; set; } = default!;
+    public DbSet<Basket> Baskets { get; set; } = default!;
+    public DbSet<BasketItem> BasketItems { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

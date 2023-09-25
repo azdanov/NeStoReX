@@ -6,9 +6,11 @@
   Paper,
   Typography,
 } from "@mui/material";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 
 export function NotFound() {
+  const [location] = useLocation();
+
   return (
     <Container component={Paper} style={{ height: 300 }}>
       <Typography
@@ -16,7 +18,7 @@ export function NotFound() {
         variant="h4"
         sx={{ py: 5, mb: 0, textAlign: "center" }}
       >
-        Sorry, the page does not exist!
+        Sorry, the page "{location}" does not exist!
       </Typography>
       <Divider />
       <Box display="flex" justifyContent="center" mt={4}>
