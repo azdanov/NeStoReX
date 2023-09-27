@@ -1,5 +1,6 @@
 ﻿using API.Data;
-using API.Entities;
+using API.Dto;
+using API.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,19 +19,19 @@ public class ProductsController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<Product>>> GetProducts()
+    public async Task<ActionResult<List<ProductDto>>> GetProducts()
     {
         var products = await _context.Products.ToListAsync();
-        return Ok(products);
+        return Ok(products.MapProductsToDtos());
     }
 
     [HttpGet("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<Product>> GetProduct(int id)
+    public async Task<ActionResult<ProductDto>> GetProduct(int id)
     {
         var product = await _context.Products.FindAsync(id);
         if (product == null) return NotFound();
-        return Ok(product);
+        return Ok(product.MapProductToDto());
     }
 }

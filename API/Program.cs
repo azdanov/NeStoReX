@@ -1,4 +1,5 @@
 using API.Data;
+using API.Extensions;
 using API.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +21,7 @@ app.UseStatusCodePages();
 
 if (app.Environment.IsDevelopment())
 {
+    app.UseSimulatedLatency(TimeSpan.FromMilliseconds(100), TimeSpan.FromMilliseconds(600));
     app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI();

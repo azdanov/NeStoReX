@@ -12,7 +12,7 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-import { api } from "../../app/api/api.ts";
+import { legacyApi } from "../../app/api/legacyApi.ts";
 
 export function AboutPage() {
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
@@ -25,7 +25,7 @@ export function AboutPage() {
       <ButtonGroup fullWidth>
         <Button
           onClick={() =>
-            api.errors
+            legacyApi.errors
               .get400Error()
               .catch((error) => toast.error(error.json.title))
           }
@@ -35,7 +35,7 @@ export function AboutPage() {
         </Button>
         <Button
           onClick={() =>
-            api.errors
+            legacyApi.errors
               .get401Error()
               .catch((error) => toast.error(error.json.title))
           }
@@ -45,7 +45,7 @@ export function AboutPage() {
         </Button>
         <Button
           onClick={() =>
-            api.errors
+            legacyApi.errors
               .get404Error()
               .catch((error) => toast.error(error.json.title))
           }
@@ -55,7 +55,7 @@ export function AboutPage() {
         </Button>
         <Button
           onClick={() =>
-            api.errors
+            legacyApi.errors
               .get500Error()
               .catch((error) => toast.error(error.json.title))
           }
@@ -65,7 +65,7 @@ export function AboutPage() {
         </Button>
         <Button
           onClick={() =>
-            api.errors
+            legacyApi.errors
               .getValidationError()
               .then(() => console.log("should not see this!"))
               .catch((error) => {

@@ -1,28 +1,54 @@
-﻿import { useEffect, useState } from "react";
+﻿import {
+  Box,
+  Button,
+  Container,
+  Divider,
+  Paper,
+  Typography,
+} from "@mui/material";
+import Grid from "@mui/material/Unstable_Grid2";
+import { Link } from "wouter";
 
-import { api } from "../../app/api/api.ts";
 import { Loader } from "../../app/layout/Loader.tsx";
-import { Product } from "../../app/models/product.ts";
-import { ProductGrid } from "./ProductGrid.tsx";
+import { useGetProductsQuery } from "../../app/store/product.ts";
+import { ProductCard } from "./ProductCard.tsx";
 
 export function ProductPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: products, isLoading } = useGetProductsQuery();
 
-  useEffect(() => {
-    api.product
-      .list()
-      .then((products) => setProducts(products as Product[]))
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return <Loader message="Loading products..." />;
+  }
+
+  if (!products || products.length === 0) {
+    return (
+      <Container component={Paper} style={{ height: 300 }}>
+        <Typography
+          gutterBottom
+          variant="h4"
+          sx={{ py: 5, mb: 0, textAlign: "center" }}
+        >
+          Sorry, no products were found!
+        </Typography>
+        <Divider />
+        <Box display="flex" justifyContent="center" mt={4}>
+          <Button component={Link} to="/" size="large">
+            Go home
+          </Button>
+        </Box>
+      </Container>
+    );
   }
 
   return (
     <>
-      <ProductGrid products={products} />
+      <Grid container spacing={4}>
+        {products.map((product) => (
+          <Grid key={product.id} xs={3}>
+            <ProductCard product={product} />
+          </Grid>
+        ))}
+      </Grid>
     </>
   );
 }

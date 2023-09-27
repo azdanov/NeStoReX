@@ -28,11 +28,8 @@ const client = wretch(API_URL)
     });
   });
 
-export const api = {
-  product: {
-    list: () => client.get("/products"),
-    get: (id: number) => client.get(`/products/${id}`),
-  },
+// Not used anywhere, just an example of how to use the api client.
+export const legacyApi = {
   errors: {
     get400Error: () => client.get("/error/bad-request"),
     get401Error: () => client.get("/error/unauthorised"),
@@ -40,14 +37,18 @@ export const api = {
     get500Error: () => client.get("/error/server-error"),
     getValidationError: () => client.get("/error/validation-error"),
   },
-  basket: {
-    get: () => client.get("/basket"),
-    addItem: (productId: number, quantity = 1) =>
-      client.post(
-        undefined,
-        `/basket/product/${productId}?quantity=${quantity}`,
-      ),
-    removeItem: (productId: number, quantity = 1) =>
-      client.delete(`/basket/product/${productId}?quantity=${quantity}`),
-  },
+  // product: {
+  //   list: () => client.get("/products"),
+  //   get: (id: number) => client.get(`/products/${id}`),
+  // },
+  // basket: {
+  //   get: () => client.get("/basket"),
+  //   addItem: (productId: number, quantity = 1) =>
+  //     client.post(
+  //       undefined,
+  //       `/basket/product/${productId}?quantity=${quantity}`,
+  //     ),
+  //   removeItem: (productId: number, quantity = 1) =>
+  //     client.delete(`/basket/product/${productId}?quantity=${quantity}`),
+  // },
 };

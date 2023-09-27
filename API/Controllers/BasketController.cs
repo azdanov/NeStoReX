@@ -27,7 +27,7 @@ public class BasketController : ControllerBase
         return Ok(basket.MapBasketToDto());
     }
 
-    [HttpPost("product/{productId:int}")]
+    [HttpPut("product/{productId:int}/add")]
     public async Task<ActionResult<BasketDto>> AddItemToBasket([FromRoute] int productId, [FromQuery] int quantity = 1)
     {
         var basket = await _basketService.GetBasketAsync(AcquireBuyerId()) ??
@@ -42,11 +42,11 @@ public class BasketController : ControllerBase
             return ValidationProblem();
         }
 
-        return CreatedAtRoute(nameof(GetBasket), basket.MapBasketToDto());
+        return Ok(basket.MapBasketToDto());
     }
 
-    [HttpDelete("product/{productId:int}")]
-    public async Task<ActionResult> RemoveBasketItem([FromRoute] int productId, [FromQuery] int quantity = 1)
+    [HttpPut("product/{productId:int}/remove")]
+    public async Task<ActionResult<BasketDto>> RemoveBasketItem([FromRoute] int productId, [FromQuery] int quantity = 1)
     {
         var basket = await _basketService.GetBasketAsync(AcquireBuyerId());
         if (basket == null) return NotFound();
@@ -61,7 +61,7 @@ public class BasketController : ControllerBase
             return ValidationProblem();
         }
 
-        return NoContent();
+        return Ok(basket.MapBasketToDto());
     }
 
     private string AcquireBuyerId()

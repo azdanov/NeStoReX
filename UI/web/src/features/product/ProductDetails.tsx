@@ -1,6 +1,10 @@
 ﻿import { LoadingButton } from "@mui/lab";
 import {
+  Box,
+  Button,
+  Container,
   Divider,
+  Paper,
   Table,
   TableBody,
   TableCell,
@@ -11,34 +15,30 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import { useParams } from "wouter";
+import { Link, useParams } from "wouter";
 
-import { api } from "../../app/api/api.ts";
-import { useStoreContext } from "../../app/context/StoreContext.ts";
 import { Loader } from "../../app/layout/Loader.tsx";
-import { Basket } from "../../app/models/basket.ts";
-import { Product } from "../../app/models/product.ts";
+import {
+  useAddItemMutation,
+  useGetBasketQuery,
+  useRemoveItemMutation,
+} from "../../app/store/basket.ts";
+import { useGetProductQuery } from "../../app/store/product.ts";
 import { priceFormat } from "../../app/utils/utils.ts";
 
 export function ProductDetails() {
-  const { basket, setBasket, removeItemFromBasket } = useStoreContext();
   const { id } = useParams<{ id: string }>();
-  const [product, setProduct] = useState<Product>();
-  const [loading, setLoading] = useState(true);
+
+  const { data: basket } = useGetBasketQuery();
+  const [addItem, { isLoading: isAddItemLoading }] = useAddItemMutation();
+  const [removeItem, { isLoading: isRemoveItemLoading }] =
+    useRemoveItemMutation();
+  const { data: product, isLoading: isProductLoading } = useGetProductQuery(id);
+
   const [selectedQuantity, setSelectedQuantity] = useState(0);
-  const [submitting, setSubmitting] = useState(false);
   const productInBasket = basket?.items.find(
     (x) => x.productId === product?.id,
   );
-
-  useEffect(() => {
-    api.product
-      .get(Number.parseInt(id, 10))
-      .then((response) => setProduct(response as Product))
-      .catch((error) => toast.error(error.json.title))
-      .finally(() => setLoading(false));
-  }, [id]);
 
   useEffect(() => {
     if (productInBasket) {
@@ -54,32 +54,41 @@ export function ProductDetails() {
   }
 
   function handleUpdateCart() {
-    setSubmitting(true);
-
     if (!productInBasket || selectedQuantity > productInBasket.quantity) {
       const updatedQuantity = productInBasket
         ? selectedQuantity - productInBasket.quantity
         : selectedQuantity;
 
-      api.basket
-        .addItem(product!.id, updatedQuantity)
-        .then((response) => setBasket(response as Basket))
-        .finally(() => setSubmitting(false));
+      addItem({ productId: product!.id, quantity: updatedQuantity });
     } else {
       const updatedQuantity = productInBasket.quantity - selectedQuantity;
-      api.basket
-        .removeItem(product!.id, updatedQuantity)
-        .then(() => removeItemFromBasket(product!.id, updatedQuantity))
-        .finally(() => setSubmitting(false));
+
+      removeItem({ productId: product!.id, quantity: updatedQuantity });
     }
   }
 
-  if (loading) {
+  if (isProductLoading) {
     return <Loader message="Loading product..." />;
   }
 
   if (!product) {
-    return <Typography variant="h2">Product not found</Typography>;
+    return (
+      <Container component={Paper} style={{ height: 300 }}>
+        <Typography
+          gutterBottom
+          variant="h4"
+          sx={{ py: 5, mb: 0, textAlign: "center" }}
+        >
+          Sorry, no product was found!
+        </Typography>
+        <Divider />
+        <Box display="flex" justifyContent="center" mt={4}>
+          <Button component={Link} to="/products" size="large">
+            Go to products
+          </Button>
+        </Box>
+      </Container>
+    );
   }
 
   return (
@@ -140,7 +149,7 @@ export function ProductDetails() {
                 productInBasket?.quantity === selectedQuantity ||
                 (!productInBasket && selectedQuantity === 0)
               }
-              loading={submitting}
+              loading={isAddItemLoading || isRemoveItemLoading}
               onClick={handleUpdateCart}
               sx={{ height: "55px" }}
               color="primary"

@@ -7,17 +7,17 @@
   TableRow,
 } from "@mui/material";
 
-import { useStoreContext } from "../../app/context/StoreContext.ts";
+import { useGetBasketQuery } from "../../app/store/basket.ts";
 import { priceFormat } from "../../app/utils/utils.ts";
 
 const deliveryThreshold = 10_000;
 const deliveryPrice = 500;
 
 export default function BasketSummary() {
-  const { basket } = useStoreContext();
+  const { data } = useGetBasketQuery();
+
   const subtotal =
-    basket?.items.reduce((sum, item) => sum + item.quantity * item.price, 0) ??
-    0;
+    data?.items.reduce((sum, item) => sum + item.quantity * item.price, 0) ?? 0;
   const deliveryFee = subtotal >= deliveryThreshold ? 0 : deliveryPrice;
 
   return (

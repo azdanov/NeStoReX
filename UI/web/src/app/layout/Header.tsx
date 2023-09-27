@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { Link, useLocation } from "wouter";
 
-import { useStoreContext } from "../context/StoreContext";
+import { useGetBasketQuery } from "../store/basket.ts";
 import { ThemeSwitch } from "./ThemeSwitch";
 
 const nav = {
@@ -32,8 +32,11 @@ interface HeaderProps {
 }
 
 export function Header({ darkMode, handleThemeChange }: HeaderProps) {
-  const { basket } = useStoreContext();
-  const itemCount = basket?.items.reduce((sum, item) => sum + item.quantity, 0);
+  const { itemCount } = useGetBasketQuery(undefined, {
+    selectFromResult: ({ data }) => ({
+      itemCount: data?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0,
+    }),
+  });
 
   return (
     <AppBar position="static" sx={{ mb: 4 }}>

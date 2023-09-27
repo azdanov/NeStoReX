@@ -2,12 +2,17 @@
 import Grid from "@mui/material/Unstable_Grid2";
 import { Link } from "wouter";
 
-import { useStoreContext } from "../../app/context/StoreContext.ts";
+import { Loader } from "../../app/layout/Loader.tsx";
+import { useGetBasketQuery } from "../../app/store/basket.ts";
 import BasketSummary from "./BasketSummary";
 import BasketTable from "./BasketTable";
 
 export function BasketPage() {
-  const { basket } = useStoreContext();
+  const { data: basket, isLoading: isBasketLoading } = useGetBasketQuery();
+
+  if (isBasketLoading) {
+    return <Loader message="Loading basket..." />;
+  }
 
   if (!basket || basket.items.length === 0) {
     return (

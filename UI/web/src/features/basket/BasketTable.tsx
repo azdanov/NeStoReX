@@ -13,9 +13,11 @@ import {
 import { useState } from "react";
 import { Link } from "wouter";
 
-import { api } from "../../app/api/api.ts";
-import { useStoreContext } from "../../app/context/StoreContext.ts";
-import { Basket } from "../../app/models/basket.ts";
+import {
+  useAddItemMutation,
+  useGetBasketQuery,
+  useRemoveItemMutation,
+} from "../../app/store/basket.ts";
 import { priceFormat } from "../../app/utils/utils.ts";
 
 enum actionType {
@@ -31,21 +33,14 @@ function getActionName(productId: number, actionType: actionType) {
 }
 
 export default function BasketTable() {
-  const { basket, setBasket, removeItemFromBasket } = useStoreContext();
+  const { data } = useGetBasketQuery();
+  const [addItem] = useAddItemMutation();
+  const [removeItem] = useRemoveItemMutation();
+
   const [loadingName, setLoadingName] = useState("");
 
-  if (!basket) {
+  if (!data) {
     return <>No items in basket.</>;
-  }
-
-  async function handleAddItem(productId: number) {
-    const updatedBasket = await api.basket.addItem(productId);
-    setBasket(updatedBasket as Basket);
-  }
-
-  async function handleRemoveItem(productId: number, quantity: number = 1) {
-    await api.basket.removeItem(productId, quantity);
-    removeItemFromBasket(productId, quantity);
   }
 
   return (
@@ -61,7 +56,7 @@ export default function BasketTable() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {basket.items.map((item) => (
+          {data.items.map((item) => (
             <TableRow
               key={item.productId}
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -93,7 +88,7 @@ export default function BasketTable() {
                     setLoadingName(
                       getActionName(item.productId, actionType.remove),
                     );
-                    handleRemoveItem(item.productId).finally(() =>
+                    removeItem({ productId: item.productId }).finally(() =>
                       setLoadingName(""),
                     );
                   }}
@@ -111,7 +106,7 @@ export default function BasketTable() {
                     setLoadingName(
                       getActionName(item.productId, actionType.add),
                     );
-                    handleAddItem(item.productId).finally(() =>
+                    addItem({ productId: item.productId }).finally(() =>
                       setLoadingName(""),
                     );
                   }}
@@ -133,10 +128,10 @@ export default function BasketTable() {
                     setLoadingName(
                       getActionName(item.productId, actionType.delete),
                     );
-
-                    handleRemoveItem(item.productId, item.quantity).finally(
-                      () => setLoadingName(""),
-                    );
+                    removeItem({
+                      productId: item.productId,
+                      quantity: item.quantity,
+                    }).finally(() => setLoadingName(""));
                   }}
                 >
                   <Delete />
