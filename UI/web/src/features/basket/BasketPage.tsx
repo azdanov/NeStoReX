@@ -3,7 +3,7 @@ import Grid from "@mui/material/Unstable_Grid2";
 import { Link } from "wouter";
 
 import { Loader } from "../../app/layout/Loader.tsx";
-import { useGetBasketQuery } from "../../app/store/basket.ts";
+import { useGetBasketQuery } from "./basketApi.ts";
 import BasketSummary from "./BasketSummary";
 import BasketTable from "./BasketTable";
 

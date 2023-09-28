@@ -1,4 +1,4 @@
-﻿using API.Middlewares;
+﻿using API.Middleware;
 
 namespace API.Extensions;
 

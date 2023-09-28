@@ -1,53 +1,100 @@
-﻿import {
-  Box,
-  Button,
-  Container,
-  Divider,
-  Paper,
-  Typography,
-} from "@mui/material";
+﻿import { Paper } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
-import { Link } from "wouter";
 
+import { AppPagination } from "../../app/components/AppPagination.tsx";
+import { CheckboxButtons } from "../../app/components/CheckboxButtons.tsx";
+import { RadioButtonGroup } from "../../app/components/RadioButtonGroup.tsx";
 import { Loader } from "../../app/layout/Loader.tsx";
-import { useGetProductsQuery } from "../../app/store/product.ts";
-import { ProductCard } from "./ProductCard.tsx";
+import {
+  useAppDispatch,
+  useAppSelector,
+} from "../../app/store/configureStore.ts";
+import {
+  useGetProductFiltersQuery,
+  useGetProductsQuery,
+} from "./productApi.ts";
+import { ProductGrid } from "./ProductGrid.tsx";
+import { ProductSearch } from "./ProductSearch.tsx";
+import {
+  getProductFiltersSelector,
+  setFilters,
+  setPageNumber,
+} from "./productSlice.ts";
+
+const sortOptions = [
+  { value: "name", label: "Alphabetical" },
+  { value: "priceDesc", label: "Price: High to Low" },
+  { value: "price", label: "Price: Low to High" },
+];
 
 export function ProductPage() {
-  const { data: products, isLoading } = useGetProductsQuery();
+  const filters = useAppSelector(getProductFiltersSelector);
+  const dispatch = useAppDispatch();
 
-  if (isLoading) {
+  const { data: paginatedProducts, isFetching: isProductsFetching } =
+    useGetProductsQuery(filters);
+  const { data: options, isLoading: isFiltersLoading } =
+    useGetProductFiltersQuery(undefined, {
+      selectFromResult: ({ data, isLoading }) => ({
+        data: data ?? { brands: [], types: [] },
+        isLoading,
+      }),
+    });
+
+  if (isFiltersLoading) {
     return <Loader message="Loading products..." />;
-  }
-
-  if (!products || products.length === 0) {
-    return (
-      <Container component={Paper} style={{ height: 300 }}>
-        <Typography
-          gutterBottom
-          variant="h4"
-          sx={{ py: 5, mb: 0, textAlign: "center" }}
-        >
-          Sorry, no products were found!
-        </Typography>
-        <Divider />
-        <Box display="flex" justifyContent="center" mt={4}>
-          <Button component={Link} to="/" size="large">
-            Go home
-          </Button>
-        </Box>
-      </Container>
-    );
   }
 
   return (
     <>
       <Grid container spacing={4}>
-        {products.map((product) => (
-          <Grid key={product.id} xs={3}>
-            <ProductCard product={product} />
-          </Grid>
-        ))}
+        <Grid xs={3}>
+          <Paper sx={{ mb: 2 }}>
+            <ProductSearch />
+          </Paper>
+          <Paper sx={{ p: 2, mb: 2 }}>
+            <RadioButtonGroup
+              selectedValue={filters.orderBy}
+              options={sortOptions}
+              onChange={(value) => dispatch(setFilters({ orderBy: value }))}
+            />
+          </Paper>
+          <Paper sx={{ p: 2, mb: 2 }}>
+            <CheckboxButtons
+              items={options.brands}
+              checked={filters.brands}
+              onChange={(checkedItems: string[]) =>
+                dispatch(setFilters({ brands: checkedItems }))
+              }
+            />
+          </Paper>
+          <Paper sx={{ p: 2 }}>
+            <CheckboxButtons
+              items={options.types}
+              checked={filters.types}
+              onChange={(checkedItems: string[]) =>
+                dispatch(setFilters({ types: checkedItems }))
+              }
+            />
+          </Paper>
+        </Grid>
+        <Grid xs={9}>
+          <ProductGrid
+            products={paginatedProducts?.products ?? []}
+            isFetching={isProductsFetching}
+          />
+        </Grid>
+        <Grid xs={3} />
+        <Grid xs={9} sx={{ mb: 2 }}>
+          {paginatedProducts?.metaData && (
+            <AppPagination
+              metaData={paginatedProducts?.metaData}
+              onPageChange={(page: number) =>
+                dispatch(setPageNumber({ currentPage: page }))
+              }
+            />
+          )}
+        </Grid>
       </Grid>
     </>
   );

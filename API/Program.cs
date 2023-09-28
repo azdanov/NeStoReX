@@ -13,6 +13,7 @@ builder.Services.AddDbContext<StoreDbContext>(options =>
 builder.Services.AddProblemDetails();
 
 builder.Services.AddScoped<IBasketService, BasketService>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 var app = builder.Build();
 
@@ -21,7 +22,7 @@ app.UseStatusCodePages();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSimulatedLatency(TimeSpan.FromMilliseconds(100), TimeSpan.FromMilliseconds(600));
+    app.UseSimulatedLatency(TimeSpan.FromMilliseconds(300), TimeSpan.FromMilliseconds(800));
     app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI();

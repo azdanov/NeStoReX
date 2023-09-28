@@ -1,8 +1,8 @@
-﻿using API.Data;
-using API.Dto;
+﻿using API.Dto;
 using API.Extensions;
+using API.Pagination;
+using API.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
 
@@ -10,18 +10,20 @@ namespace API.Controllers;
 [Route("api/[controller]")]
 public class ProductsController : ControllerBase
 {
-    private readonly StoreDbContext _context;
+    private readonly IProductService _productService;
 
-    public ProductsController(StoreDbContext context)
+    public ProductsController(IProductService productService)
     {
-        _context = context;
+        _productService = productService;
     }
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<ProductDto>>> GetProducts()
+    public async Task<ActionResult<List<ProductDto>>> GetProducts([FromQuery] ProductParams productParams)
     {
-        var products = await _context.Products.ToListAsync();
+        var products = await _productService.GetProductsAsync(productParams);
+
+        Response.AddPaginationHeader(products.Pagination);
         return Ok(products.MapProductsToDtos());
     }
 
@@ -30,8 +32,14 @@ public class ProductsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ProductDto>> GetProduct(int id)
     {
-        var product = await _context.Products.FindAsync(id);
+        var product = await _productService.GetProductByIdAsync(id);
         if (product == null) return NotFound();
         return Ok(product.MapProductToDto());
+    }
+
+    [HttpGet("filters")]
+    public async Task<ActionResult<ProductFilters>> GetProductFilters()
+    {
+        return Ok(await _productService.GetProductFiltersAsync());
     }
 }

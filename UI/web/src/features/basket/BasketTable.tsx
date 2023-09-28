@@ -13,12 +13,12 @@ import {
 import { useState } from "react";
 import { Link } from "wouter";
 
+import { priceFormat } from "../../app/utils/utils.ts";
 import {
   useAddItemMutation,
   useGetBasketQuery,
   useRemoveItemMutation,
-} from "../../app/store/basket.ts";
-import { priceFormat } from "../../app/utils/utils.ts";
+} from "./basketApi.ts";
 
 enum actionType {
   add = "add",

@@ -12,8 +12,8 @@ import {
 import { Link } from "wouter";
 
 import { Product } from "../../app/models/product.ts";
-import { useAddItemMutation } from "../../app/store/basket.ts";
 import { priceFormat } from "../../app/utils/utils.ts";
+import { useAddItemMutation } from "../basket/basketApi.ts";
 
 interface Props {
   product: Product;

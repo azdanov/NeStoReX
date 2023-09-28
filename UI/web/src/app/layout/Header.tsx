@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { Link, useLocation } from "wouter";
 
-import { useGetBasketQuery } from "../store/basket.ts";
+import { useGetBasketQuery } from "../../features/basket/basketApi.ts";
 import { ThemeSwitch } from "./ThemeSwitch";
 
 const nav = {

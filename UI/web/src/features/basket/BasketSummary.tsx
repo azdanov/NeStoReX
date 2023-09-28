@@ -7,8 +7,8 @@
   TableRow,
 } from "@mui/material";
 
-import { useGetBasketQuery } from "../../app/store/basket.ts";
 import { priceFormat } from "../../app/utils/utils.ts";
+import { useGetBasketQuery } from "./basketApi.ts";
 
 const deliveryThreshold = 10_000;
 const deliveryPrice = 500;

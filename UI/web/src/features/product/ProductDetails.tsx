@@ -18,13 +18,13 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "wouter";
 
 import { Loader } from "../../app/layout/Loader.tsx";
+import { priceFormat } from "../../app/utils/utils.ts";
 import {
   useAddItemMutation,
   useGetBasketQuery,
   useRemoveItemMutation,
-} from "../../app/store/basket.ts";
-import { useGetProductQuery } from "../../app/store/product.ts";
-import { priceFormat } from "../../app/utils/utils.ts";
+} from "../basket/basketApi.ts";
+import { useGetProductQuery } from "./productApi.ts";
 
 export function ProductDetails() {
   const { id } = useParams<{ id: string }>();

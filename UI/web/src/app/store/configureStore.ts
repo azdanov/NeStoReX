@@ -7,6 +7,7 @@
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
+import { productSlice } from "../../features/product/productSlice.ts";
 import { storeApi } from "./storeApi.ts";
 
 export const rtkQueryErrorLogger: Middleware =
@@ -23,6 +24,7 @@ export const rtkQueryErrorLogger: Middleware =
 
 export const store = configureStore({
   reducer: {
+    product: productSlice.reducer,
     [storeApi.reducerPath]: storeApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>

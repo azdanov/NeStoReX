@@ -1,5 +1,5 @@
-﻿import { Basket } from "../models/basket.ts";
-import { storeApi } from "./storeApi.ts";
+﻿import { Basket } from "../../app/models/basket.ts";
+import { storeApi } from "../../app/store/storeApi.ts";
 
 export const basketApi = storeApi.injectEndpoints({
   endpoints: (builder) => ({

@@ -1,4 +1,4 @@
-﻿namespace API.Middlewares;
+﻿namespace API.Middleware;
 
 public class SimulatedLatencyMiddleware
 {
