@@ -1,12 +1,17 @@
-﻿import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+﻿import { createApi } from "@reduxjs/toolkit/query/react";
 
-const API_URL = import.meta.env.VITE_API_URL;
+import { baseQueryWithReauth } from "./baseQuery.ts";
 
-export const tagTypes = ["Product", "Basket", "ProductOptions"] as const;
+export const tagTypes = [
+  "Product",
+  "Basket",
+  "ProductOptions",
+  "User",
+] as const;
 
 export const storeApi = createApi({
   reducerPath: "storeApi",
-  baseQuery: fetchBaseQuery({ baseUrl: API_URL }),
+  baseQuery: baseQueryWithReauth,
   tagTypes: tagTypes,
   endpoints: () => ({}),
 });

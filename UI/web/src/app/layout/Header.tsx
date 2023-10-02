@@ -4,15 +4,16 @@ import {
   Badge,
   Box,
   IconButton,
-  List,
-  ListItem,
   Toolbar,
   Typography,
 } from "@mui/material";
-import { Link, useLocation } from "wouter";
+import { Link } from "wouter";
 
+import { useGetCurrentUserQuery } from "../../features/account/accountApi.ts";
 import { useGetBasketQuery } from "../../features/basket/basketApi.ts";
+import { Menu } from "./Menu.tsx";
 import { ThemeSwitch } from "./ThemeSwitch";
+import { UserMenu } from "./UserMenu.tsx";
 
 const nav = {
   middle: [
@@ -32,6 +33,8 @@ interface HeaderProps {
 }
 
 export function Header({ darkMode, handleThemeChange }: HeaderProps) {
+  const { data: user } = useGetCurrentUserQuery();
+
   const { itemCount } = useGetBasketQuery(undefined, {
     selectFromResult: ({ data }) => ({
       itemCount: data?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0,
@@ -66,7 +69,7 @@ export function Header({ darkMode, handleThemeChange }: HeaderProps) {
           />
         </Box>
         <Box>
-          <NavList items={nav.middle} />
+          <Menu items={nav.middle} />
         </Box>
         <Box display="flex" alignItems="center">
           <IconButton
@@ -81,43 +84,9 @@ export function Header({ darkMode, handleThemeChange }: HeaderProps) {
               <ShoppingCart />
             </Badge>
           </IconButton>
-          <NavList items={nav.right} />
+          {user ? <UserMenu /> : <Menu items={nav.right} />}
         </Box>
       </Toolbar>
     </AppBar>
-  );
-}
-
-interface MenuProps {
-  items: { label: string; path: string }[];
-}
-
-function NavList({ items }: MenuProps) {
-  const [location] = useLocation();
-
-  return (
-    <List sx={{ display: "flex" }}>
-      {items.map(({ label, path }) => (
-        <ListItem
-          className={location === path ? "active" : ""}
-          key={path}
-          component={Link}
-          to={path}
-          sx={{
-            pb: "6px",
-            borderBottom: "2px solid transparent",
-            color: "inherit",
-            typography: "h6",
-            "&:hover": { color: "#e3f2fd" },
-            "&.active": {
-              color: "#fff",
-              borderBottom: "2px solid #fff",
-            },
-          }}
-        >
-          {label.toUpperCase()}
-        </ListItem>
-      ))}
-    </List>
   );
 }

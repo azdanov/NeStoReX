@@ -68,7 +68,7 @@ export function ProductCard({ product }: Props) {
           onClick={() => addItem({ productId: product.id })}
           size="small"
         >
-          Add to cart
+          <span>Add to cart</span>
         </LoadingButton>
         <Button component={Link} size="small" to={`/products/${product.id}`}>
           View

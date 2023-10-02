@@ -12,12 +12,15 @@ import { useDarkMode } from "usehooks-ts";
 import { Route, Switch } from "wouter";
 
 import { AboutPage } from "../../features/about/AboutPage.tsx";
+import { LoginPage } from "../../features/account/LoginPage.tsx";
+import { RegisterPage } from "../../features/account/RegisterPage.tsx";
 import { BasketPage } from "../../features/basket/BasketPage.tsx";
 import { CheckoutPage } from "../../features/checkout/CheckoutPage.tsx";
 import { ContactPage } from "../../features/contact/ContactPage.tsx";
 import { HomePage } from "../../features/home/HomePage.tsx";
-import { ProductDetails } from "../../features/product/ProductDetails.tsx";
+import { ProductDetailsPage } from "../../features/product/ProductDetailsPage.tsx";
 import { ProductPage } from "../../features/product/ProductPage.tsx";
+import { AuthRoute } from "../components/AuthRoute.tsx";
 import { NotFound } from "../errors/NotFound.tsx";
 import { Header } from "./Header.tsx";
 
@@ -47,11 +50,13 @@ export function App() {
         <Switch>
           <Route path="/" component={HomePage} />
           <Route path="/products" component={ProductPage} />
-          <Route path="/products/:id" component={ProductDetails} />
+          <Route path="/products/:id" component={ProductDetailsPage} />
           <Route path="/about" component={AboutPage} />
           <Route path="/contact" component={ContactPage} />
           <Route path="/basket" component={BasketPage} />
-          <Route path="/checkout" component={CheckoutPage} />
+          <Route path="/login" component={LoginPage} />
+          <Route path="/register" component={RegisterPage} />
+          <AuthRoute path="/checkout" component={CheckoutPage} />
           <Route component={NotFound} />
         </Switch>
       </Container>

@@ -53,6 +53,8 @@ public class BasketService : IBasketService
         {
             basket.Items.Add(new BasketItem { Product = product, Quantity = quantity, Basket = basket });
         }
+        
+        _context.Baskets.Update(basket);
 
         var result = await _context.SaveChangesAsync();
         if (result <= 0) throw new ServerException("Problem saving item to basket.");
@@ -74,6 +76,8 @@ public class BasketService : IBasketService
 
         item.Quantity -= quantity;
         if (item.Quantity == 0) basket.Items.Remove(item);
+        
+        _context.Baskets.Update(basket);
 
         var result = await _context.SaveChangesAsync();
         if (result <= 0) throw new ServerException("Problem removing item from the basket.");

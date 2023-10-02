@@ -18,14 +18,19 @@ public class BasketController : ControllerBase
         _basketService = basketService;
     }
 
-    [HttpGet(Name = nameof(GetBasket))]
+    [HttpGet]
     public async Task<ActionResult<BasketDto>> GetBasket()
     {
         var basket = await _basketService.GetBasketAsync(AcquireBuyerId());
-        if (basket == null) return NotFound();
+        if (basket == null)
+        {
+            CleanupCookie();
+            return NotFound();
+        }
 
         return Ok(basket.MapBasketToDto());
     }
+
 
     [HttpPut("product/{productId:int}/add")]
     public async Task<ActionResult<BasketDto>> AddItemToBasket([FromRoute] int productId, [FromQuery] int quantity = 1)
@@ -66,14 +71,23 @@ public class BasketController : ControllerBase
 
     private string AcquireBuyerId()
     {
-        var buyerId = User.Identity?.Name ?? Request.Cookies[BuyerIdCookie];
+        var buyerId = Request.Cookies[BuyerIdCookie];
 
         if (!string.IsNullOrEmpty(buyerId)) return buyerId;
 
         buyerId = Guid.NewGuid().ToString();
-        var cookieOptions = new CookieOptions { IsEssential = true, Expires = DateTime.Now.AddDays(30) };
-        Response.Cookies.Append(BuyerIdCookie, buyerId, cookieOptions);
+
+        Response.Cookies.Append(BuyerIdCookie, buyerId, new CookieOptions
+            { IsEssential = true, Expires = DateTime.Now.AddDays(30), HttpOnly = false });
 
         return buyerId;
+    }
+
+    private void CleanupCookie()
+    {
+        if (Request.Cookies.ContainsKey(BuyerIdCookie))
+        {
+            Response.Cookies.Delete(BuyerIdCookie);
+        }
     }
 }

@@ -26,7 +26,7 @@ import {
 } from "../basket/basketApi.ts";
 import { useGetProductQuery } from "./productApi.ts";
 
-export function ProductDetails() {
+export function ProductDetailsPage() {
   const { id } = useParams<{ id: string }>();
 
   const { data: basket } = useGetBasketQuery();
@@ -157,7 +157,7 @@ export function ProductDetails() {
               variant="contained"
               fullWidth
             >
-              {productInBasket ? "Update Quantity" : "Add to Cart"}
+              <span>{productInBasket ? "Update Quantity" : "Add to Cart"}</span>
             </LoadingButton>
           </Grid>
         </Grid>

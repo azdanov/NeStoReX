@@ -1,10 +1,24 @@
-﻿import { Basket } from "../../app/models/basket.ts";
+﻿import { QueryReturnValue } from "@reduxjs/toolkit/dist/query/baseQueryTypes";
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+
+import { Basket } from "../../app/models/basket.ts";
 import { storeApi } from "../../app/store/storeApi.ts";
+import { getCookie } from "../../app/utils/utils.ts";
 
 export const basketApi = storeApi.injectEndpoints({
   endpoints: (builder) => ({
     getBasket: builder.query<Basket, void>({
-      query: () => "basket",
+      queryFn: async (_arguments, _api, _extraOptions, baseQuery) => {
+        if (!getCookie("buyerId")) {
+          return {} as QueryReturnValue<Basket, FetchBaseQueryError>;
+        }
+
+        const { data, error } = await baseQuery("/basket");
+        return {
+          data,
+          error,
+        } as QueryReturnValue<Basket, FetchBaseQueryError>;
+      },
       providesTags: ["Basket"],
     }),
     addItem: builder.mutation<Basket, { productId: number; quantity?: number }>(

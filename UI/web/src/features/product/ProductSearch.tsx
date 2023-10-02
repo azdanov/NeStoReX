@@ -1,19 +1,21 @@
-﻿import { TextField } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import { useDebounce } from "usehooks-ts";
+﻿import { debounce, TextField } from "@mui/material";
+import React, { useState } from "react";
 
-import { useAppDispatch, useAppSelector } from "../../app/store/configureStore";
+import { useAppDispatch, useAppSelector } from "../../app/store/store";
 import { setFilters } from "./productSlice.ts";
 
 export function ProductSearch() {
   const { filters } = useAppSelector((state) => state.product);
   const [searchTerm, setSearchTerm] = useState(filters.searchTerm ?? "");
   const dispatch = useAppDispatch();
-  const debouncedSearch = useDebounce<string>(searchTerm, 1000);
 
-  useEffect(() => {
-    dispatch(setFilters({ searchTerm: debouncedSearch }));
-  }, [dispatch, debouncedSearch]);
+  const debouncedSearch = React.useMemo(
+    () =>
+      debounce((input: string) => {
+        dispatch(setFilters({ searchTerm: input }));
+      }, 400),
+    [dispatch],
+  );
 
   return (
     <TextField
@@ -23,6 +25,7 @@ export function ProductSearch() {
       value={searchTerm}
       onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
+        debouncedSearch(event.target.value);
       }}
     />
   );

@@ -5,10 +5,7 @@ import { AppPagination } from "../../app/components/AppPagination.tsx";
 import { CheckboxButtons } from "../../app/components/CheckboxButtons.tsx";
 import { RadioButtonGroup } from "../../app/components/RadioButtonGroup.tsx";
 import { Loader } from "../../app/layout/Loader.tsx";
-import {
-  useAppDispatch,
-  useAppSelector,
-} from "../../app/store/configureStore.ts";
+import { useAppDispatch, useAppSelector } from "../../app/store/store.ts";
 import {
   useGetProductFiltersQuery,
   useGetProductsQuery,
