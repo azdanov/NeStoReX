@@ -18,6 +18,7 @@ import { BasketPage } from "../../features/basket/BasketPage.tsx";
 import { CheckoutPage } from "../../features/checkout/CheckoutPage.tsx";
 import { ContactPage } from "../../features/contact/ContactPage.tsx";
 import { HomePage } from "../../features/home/HomePage.tsx";
+import { OrdersPage } from "../../features/order/OrdersPage.tsx";
 import { ProductDetailsPage } from "../../features/product/ProductDetailsPage.tsx";
 import { ProductPage } from "../../features/product/ProductPage.tsx";
 import { AuthRoute } from "../components/AuthRoute.tsx";
@@ -57,6 +58,7 @@ export function App() {
           <Route path="/login" component={LoginPage} />
           <Route path="/register" component={RegisterPage} />
           <AuthRoute path="/checkout" component={CheckoutPage} />
+          <AuthRoute path="/orders" component={OrdersPage} />
           <Route component={NotFound} />
         </Switch>
       </Container>

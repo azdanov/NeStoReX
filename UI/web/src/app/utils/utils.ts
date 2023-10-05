@@ -1,21 +1,20 @@
-﻿export const priceFormat = (value: number, config?: { fraction?: number }) => {
+﻿const locale = "et-EE";
+
+export const priceFormat = (value: number, config?: { fraction?: number }) => {
   const { fraction = 2 } = config ?? {};
   value = value / 100;
 
-  return new Intl.NumberFormat("et-EE", {
+  return new Intl.NumberFormat(locale, {
     style: "currency",
     currency: "EUR",
     maximumFractionDigits: fraction,
   }).format(value);
 };
 
-export function getCookie(key: string) {
-  const cookies = document.cookie.split("; ");
-  const cookie = cookies.find((cookie) => cookie.startsWith(key));
+export const dateFormat = (date: Date) => {
+  return new Intl.DateTimeFormat(locale).format(date);
+};
 
-  if (!cookie) {
-    return;
-  }
-
-  return cookie.split("=")[1];
+export function wait<T>(ms: number, value?: T) {
+  return new Promise<T>((resolve) => setTimeout(resolve, ms, value));
 }

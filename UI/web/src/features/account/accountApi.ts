@@ -1,5 +1,8 @@
 ﻿import { QueryReturnValue } from "@reduxjs/toolkit/dist/query/baseQueryTypes";
-import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import {
+  FetchBaseQueryError,
+  FetchBaseQueryMeta,
+} from "@reduxjs/toolkit/query";
 
 import {
   LoginRequest,
@@ -19,7 +22,7 @@ export const accountApi = storeApi.injectEndpoints({
         method: "POST",
         body: credentials,
       }),
-      invalidatesTags: [{ type: "User", id: "ME" }],
+      invalidatesTags: [{ type: "User", id: "ME" }, { type: "Basket" }],
     }),
     registerUser: builder.mutation<void, RegisterRequest>({
       query: (credentials) => ({
@@ -27,7 +30,6 @@ export const accountApi = storeApi.injectEndpoints({
         method: "POST",
         body: credentials,
       }),
-      invalidatesTags: [{ type: "User", id: "ME" }],
     }),
     refreshToken: builder.mutation<TokenResponse, RefreshTokenRequest>({
       query: (tokens) => ({
@@ -42,20 +44,20 @@ export const accountApi = storeApi.injectEndpoints({
         url: "accounts/logout",
         method: "POST",
       }),
-      invalidatesTags: [{ type: "User", id: "ME" }],
+      invalidatesTags: [{ type: "User", id: "ME" }, { type: "Basket" }],
     }),
     getCurrentUser: builder.query<User, void>({
-      queryFn: async (_arguments, { getState }, _extraOptions, baseQuery) => {
-        const token = (getState() as RootState).auth.accessToken;
-        if (!token) {
+      queryFn: async (_args, { getState }, _extraOptions, baseQuery) => {
+        const isGuest = (getState() as RootState).auth.tokens === undefined;
+        if (isGuest) {
           return {} as QueryReturnValue<User, FetchBaseQueryError>;
         }
 
-        const response = await baseQuery("accounts/current-user");
-        return {
-          data: response.data,
-          error: response.error,
-        } as QueryReturnValue<User, FetchBaseQueryError>;
+        return (await baseQuery("accounts/current-user")) as QueryReturnValue<
+          User,
+          FetchBaseQueryError,
+          FetchBaseQueryMeta
+        >;
       },
       providesTags: [{ type: "User", id: "ME" }],
     }),
@@ -65,7 +67,6 @@ export const accountApi = storeApi.injectEndpoints({
 export const {
   useLoginUserMutation,
   useRegisterUserMutation,
-  useRefreshTokenMutation,
   useLogoutUserMutation,
   useGetCurrentUserQuery,
 } = accountApi;

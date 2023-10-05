@@ -11,15 +11,18 @@ import {
 import Grid from "@mui/material/Unstable_Grid2";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { Link, useLocation } from "wouter";
+import { Link, Redirect, useLocation } from "wouter";
 
 import { RegisterRequest } from "../../app/models/account.ts";
 import { ErrorResponse } from "../../app/models/error.ts";
+import { useAppSelector } from "../../app/store/store.ts";
 import { useRegisterUserMutation } from "./accountApi";
 
 interface FormValues extends RegisterRequest {}
 
 export function RegisterPage() {
+  const isAuthenticated = useAppSelector((state) => !!state.auth.tokens);
+
   const [_, setLocation] = useLocation();
   const [registerUser] = useRegisterUserMutation();
 
@@ -31,6 +34,10 @@ export function RegisterPage() {
   } = useForm<FormValues>({
     mode: "onTouched",
   });
+
+  if (isAuthenticated) {
+    return <Redirect to="/products" />;
+  }
 
   function handleApiErrors(errors: ErrorResponse) {
     if (errors) {
@@ -102,7 +109,7 @@ export function RegisterPage() {
             required: "Email is required",
             pattern: {
               value:
-                /^(([^\s"(),.:;<>@[\\\]]+(\.[^\s"(),.:;<>@[\\\]]+)*)|(".+"))@((\[(?:\d{1,3}\.){3}\d{1,3}])|(([\dA-Za-z-]+\.)+[A-Za-z]{2,}))$/,
+                /^(?!\.)(?!.*\.\.)([\w+-.]*)[\w+-]@([\da-z][\da-z-]*\.)+[a-z]{2,}$/i,
               message: "Not a valid email address",
             },
           })}

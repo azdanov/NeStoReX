@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 using API.Entities;
+using API.Entities.Order;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,12 +16,22 @@ public class StoreDbContext : IdentityDbContext<User, Role, int>
     public DbSet<Product> Products { get; set; } = default!;
     public DbSet<Basket> Baskets { get; set; } = default!;
     public DbSet<BasketItem> BasketItems { get; set; } = default!;
+    public DbSet<Order> Orders { get; set; } = default!;
+    public DbSet<OrderItem> OrderItems { get; set; } = default!;
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        base.OnModelCreating(modelBuilder);
+        base.OnModelCreating(builder);
 
-        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+        builder.Entity<User>().ToTable("Users");
+        builder.Entity<Role>().ToTable("Roles");
+        builder.Entity<IdentityUserClaim<int>>().ToTable("UserClaims");
+        builder.Entity<IdentityUserRole<int>>().ToTable("UserRoles");
+        builder.Entity<IdentityUserLogin<int>>().ToTable("UserLogins");
+        builder.Entity<IdentityRoleClaim<int>>().ToTable("RoleClaims");
+        builder.Entity<IdentityUserToken<int>>().ToTable("UserTokens");
     }
 
     public override int SaveChanges()

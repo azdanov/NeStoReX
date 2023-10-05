@@ -1,18 +1,29 @@
 ﻿using API.Entities;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace API.Data.Configurations;
 
-public class UsersConfiguration : IEntityTypeConfiguration<User>
+public class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
         builder
-            .HasOne(a => a.Address)
+            .HasOne(user => user.Address)
             .WithOne()
             .HasForeignKey<UserAddress>(a => a.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder
+            .HasOne(user => user.Basket)
+            .WithOne(basket => basket.User)
+            .HasForeignKey<Basket>(b => b.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder
+            .HasMany(user => user.Orders)
+            .WithOne(order => order.User)
+            .HasForeignKey(order => order.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasData(

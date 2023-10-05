@@ -2,20 +2,29 @@
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
 import { authSlice } from "../../features/account/authSlice.ts";
+import { guestBasketSlice } from "../../features/basket/guestBasketSlice.ts";
 import { productSlice } from "../../features/product/productSlice.ts";
-import { authLocalStorage, rtkQueryErrorLogger } from "./middleware.ts";
+import {
+  authListener,
+  basketListener,
+  loginListener,
+  rtkQueryErrorLogger,
+} from "./middleware.ts";
 import { storeApi } from "./storeApi.ts";
 
 export const store = configureStore({
   reducer: {
     auth: authSlice.reducer,
     product: productSlice.reducer,
+    guestBasket: guestBasketSlice.reducer,
     [storeApi.reducerPath]: storeApi.reducer,
   },
   middleware: (getDefaultMiddleware) => [
     ...getDefaultMiddleware(),
     rtkQueryErrorLogger,
-    authLocalStorage.middleware,
+    authListener.middleware,
+    loginListener.middleware,
+    basketListener.middleware,
     storeApi.middleware,
   ],
 });

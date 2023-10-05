@@ -10,7 +10,6 @@ public static class BasketExtensions
         return new BasketDto
         {
             Id = basket.Id,
-            BuyerId = basket.BuyerId,
             Items = basket.Items
                 .Select(item => new BasketItemDto
                 {

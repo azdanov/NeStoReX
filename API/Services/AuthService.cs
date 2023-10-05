@@ -1,7 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using API.Dto;
+using API.Data;
 using API.Entities;
 using API.Options;
 using Microsoft.AspNetCore.Identity;
@@ -12,12 +12,14 @@ namespace API.Services;
 
 public class AuthService : IAuthService
 {
+    private readonly StoreDbContext _context;
     private readonly JwtSettingsOptions _jwtSettings;
     private readonly UserManager<User> _userManager;
 
-    public AuthService(UserManager<User> userManager, IOptions<JwtSettingsOptions> jwtSettings)
+    public AuthService(UserManager<User> userManager, IOptions<JwtSettingsOptions> jwtSettings, StoreDbContext context)
     {
         _userManager = userManager;
+        _context = context;
         _jwtSettings = jwtSettings.Value;
     }
 
@@ -25,13 +27,16 @@ public class AuthService : IAuthService
     {
         var userClaims = await _userManager.GetClaimsAsync(user);
         var roles = await _userManager.GetRolesAsync(user);
+        await _context.Entry(user).Reference(x => x.Basket).LoadAsync();
 
         var roleClaims = roles.Select(role => new Claim(ClaimTypes.Role, role)).ToList();
 
         var claims = new[]
             {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.UserName!),
                 new Claim(ClaimTypes.Email, user.Email!),
+                new Claim(Constants.BasketIdClaim, user.Basket.Id.ToString())
             }
             .Union(userClaims)
             .Union(roleClaims);
@@ -68,7 +73,7 @@ public class AuthService : IAuthService
             ValidAudience = _jwtSettings.Audience,
             ValidIssuer = _jwtSettings.Issuer,
             ValidAlgorithms = new[] { SecurityAlgorithms.HmacSha256 },
-            ValidateLifetime = false,
+            ValidateLifetime = false
         };
 
         var tokenHandler = new JwtSecurityTokenHandler();

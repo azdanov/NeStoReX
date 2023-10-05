@@ -8,16 +8,18 @@
 } from "@mui/material";
 
 import { priceFormat } from "../../app/utils/utils.ts";
-import { useGetBasketQuery } from "./basketApi.ts";
 
 const deliveryThreshold = 10_000;
 const deliveryPrice = 500;
 
-export default function BasketSummary() {
-  const { data } = useGetBasketQuery();
+interface Props {
+  items: { quantity: number; price: number }[];
+}
 
+export function ProductsSummary({ items }: Props) {
   const subtotal =
-    data?.items.reduce((sum, item) => sum + item.quantity * item.price, 0) ?? 0;
+    items.reduce((sum, item) => sum + item.quantity * item.price, 0) ?? 0;
+
   const deliveryFee = subtotal >= deliveryThreshold ? 0 : deliveryPrice;
 
   return (

@@ -50,7 +50,10 @@ export const productSlice = createSlice({
 
 export const { setFilters, resetFilters, setPageNumber } = productSlice.actions;
 
-const selectSelf = ({ product }: { product: ProductState }) => product;
+function selectSelf({ product }: { product: ProductState }) {
+  return product;
+}
+
 export const getProductFiltersSelector = createSelector(
   selectSelf,
   ({ filters }) => {

@@ -1,6 +1,4 @@
-﻿import { Basket } from "./basket.ts";
-
-export interface LoginRequest {
+﻿export interface LoginRequest {
   username: string;
   password: string;
 }
@@ -21,6 +19,15 @@ export interface TokenResponse {
 
 export interface User {
   email: string;
-  basket?: Basket;
-  roles?: string[];
+  address: Address;
+}
+
+export interface Address {
+  fullName: string;
+  address1: string;
+  address2?: string;
+  city: string;
+  state: string;
+  zip: string;
+  country: string;
 }

@@ -7,6 +7,8 @@ export const tagTypes = [
   "Basket",
   "ProductOptions",
   "User",
+  "Address",
+  "Order",
 ] as const;
 
 export const storeApi = createApi({

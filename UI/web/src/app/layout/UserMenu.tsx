@@ -35,14 +35,14 @@ export function UserMenu() {
         TransitionComponent={Fade}
       >
         <MenuItem onClick={handleClose}>Profile</MenuItem>
-        <MenuItem component={Link} to="/orders">
+        <MenuItem onClick={handleClose} component={Link} to="/orders">
           My orders
         </MenuItem>
         <MenuItem
           onClick={async () => {
             handleClose();
             await logout().unwrap();
-            setLocation("/");
+            setLocation("/products");
           }}
         >
           Logout

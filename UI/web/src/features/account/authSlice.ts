@@ -4,8 +4,10 @@ import { createSelector, createSlice, isAnyOf } from "@reduxjs/toolkit";
 import { accountApi } from "./accountApi.ts";
 
 type AuthState = {
-  accessToken?: string;
-  refreshToken?: string;
+  tokens?: {
+    accessToken: string;
+    refreshToken: string;
+  };
 };
 
 export const authLocalStorageKey = "auth";
@@ -18,26 +20,34 @@ export const authSlice = createSlice({
   name: "auth",
   initialState: initialState,
   reducers: {
-    setTokens: (state, action: PayloadAction<Required<AuthState>>) => {
-      state.accessToken = action.payload.accessToken;
-      state.refreshToken = action.payload.refreshToken;
+    setTokens: (
+      state,
+      action: PayloadAction<Required<AuthState>["tokens"]>,
+    ) => {
+      state.tokens = {
+        accessToken: action.payload.accessToken,
+        refreshToken: action.payload.refreshToken,
+      };
     },
     clearTokens: (state) => {
-      state.accessToken = undefined;
-      state.refreshToken = undefined;
+      state.tokens = undefined;
     },
   },
   extraReducers: (builder) => {
     builder.addMatcher(
       isAnyOf(
         accountApi.endpoints.loginUser.matchFulfilled,
-        accountApi.endpoints.registerUser.matchFulfilled,
         accountApi.endpoints.refreshToken.matchFulfilled,
         accountApi.endpoints.logoutUser.matchFulfilled,
       ),
       (state, action) => {
-        state.accessToken = action.payload?.accessToken;
-        state.refreshToken = action.payload?.refreshToken;
+        const accessToken = action.payload?.accessToken;
+        const refreshToken = action.payload?.refreshToken;
+
+        state.tokens =
+          accessToken && refreshToken
+            ? { accessToken, refreshToken }
+            : undefined;
       },
     );
   },
@@ -45,11 +55,11 @@ export const authSlice = createSlice({
 
 export const { setTokens, clearTokens } = authSlice.actions;
 
-const selectSelf = ({ auth }: { auth: AuthState }) => auth;
+function selectSelf({ auth }: { auth: AuthState }) {
+  return auth;
+}
 
-export const getTokensSetSelector = createSelector(
+export const getIsAuthenticated = createSelector(
   selectSelf,
-  ({ accessToken, refreshToken }) => {
-    return accessToken != undefined && refreshToken != undefined;
-  },
+  ({ tokens }) => !!tokens,
 );

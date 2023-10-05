@@ -1,4 +1,5 @@
 ﻿using API.Data;
+using API.Dto;
 using API.Entities;
 using API.Exceptions;
 using Microsoft.EntityFrameworkCore;
@@ -14,23 +15,12 @@ public class BasketService : IBasketService
         _context = context;
     }
 
-    public async Task<Basket?> GetBasketAsync(string buyerId)
+    public async Task<Basket?> GetBasketAsync(int basketId)
     {
         return await _context.Baskets
-            .Include(i => i.Items)
-            .ThenInclude(p => p.Product)
-            .FirstOrDefaultAsync(b => b.BuyerId == buyerId);
-    }
-
-    public async Task<Basket> CreateBasketAsync(string buyerId)
-    {
-        var basket = new Basket { BuyerId = buyerId };
-        _context.Baskets.Add(basket);
-
-        var result = await _context.SaveChangesAsync();
-        if (result <= 0) throw new ServerException("Problem creating basket.");
-
-        return basket;
+            .Include(basket => basket.Items)
+            .ThenInclude(basketItem => basketItem.Product)
+            .FirstOrDefaultAsync(basket => basket.Id == basketId);
     }
 
     public async Task AddItemToBasketAsync(Basket basket, int productId, int quantity = 1)
@@ -53,7 +43,7 @@ public class BasketService : IBasketService
         {
             basket.Items.Add(new BasketItem { Product = product, Quantity = quantity, Basket = basket });
         }
-        
+
         _context.Baskets.Update(basket);
 
         var result = await _context.SaveChangesAsync();
@@ -76,10 +66,41 @@ public class BasketService : IBasketService
 
         item.Quantity -= quantity;
         if (item.Quantity == 0) basket.Items.Remove(item);
-        
+
         _context.Baskets.Update(basket);
 
         var result = await _context.SaveChangesAsync();
         if (result <= 0) throw new ServerException("Problem removing item from the basket.");
+    }
+
+    public async Task TransferBasketAsync(int basketId, User user)
+    {
+        var anonymousBasket = await _context.Baskets.FirstOrDefaultAsync(basket => basket.Id == basketId);
+        if (anonymousBasket == null) return;
+
+        await _context.Entry(user).Reference(x => x.Basket).LoadAsync();
+
+        var userBasket = await _context.Baskets.FirstOrDefaultAsync(basket => basket.Id == user.Basket.Id);
+        if (userBasket != null) _context.Baskets.Remove(userBasket);
+
+        user.Basket = anonymousBasket;
+        _context.Users.Update(user);
+
+        await _context.SaveChangesAsync();
+    }
+
+    public Task SaveBasketsAsync(Basket basket, BasketDto basketDto)
+    {
+        basket.Items.Clear();
+        basket.Items.AddRange(basketDto.Items.Select(item => new BasketItem
+        {
+            ProductId = item.ProductId,
+            Quantity = item.Quantity,
+            Basket = basket
+        }));
+
+        _context.Baskets.Update(basket);
+
+        return _context.SaveChangesAsync();
     }
 }

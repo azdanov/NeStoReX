@@ -1,11 +1,11 @@
-﻿import { Button } from "@mui/material";
+﻿import { Box, Button, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { Link } from "wouter";
 
 import { Loader } from "../../app/layout/Loader.tsx";
+import { ProductsSummary } from "../product/ProductsSummary.tsx";
+import { ProductTable } from "../product/ProductTable.tsx";
 import { useGetBasketQuery } from "./basketApi.ts";
-import BasketSummary from "./BasketSummary";
-import BasketTable from "./BasketTable";
 
 export function BasketPage() {
   const { data: basket, isLoading: isBasketLoading } = useGetBasketQuery();
@@ -37,11 +37,16 @@ export function BasketPage() {
 
   return (
     <>
-      <BasketTable />
+      <Box display="flex" justifyContent="space-between">
+        <Typography sx={{ p: 2 }} gutterBottom variant="h4">
+          Basket
+        </Typography>
+      </Box>
+      <ProductTable items={basket.items} showControls />
       <Grid container>
         <Grid xs={6} />
         <Grid xs={6}>
-          <BasketSummary />
+          <ProductsSummary items={basket.items} />
           <Button
             component={Link}
             to="/checkout"

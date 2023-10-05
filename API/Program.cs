@@ -1,6 +1,5 @@
 using System.Text;
 using API.Data;
-using API.Dto;
 using API.Entities;
 using API.Extensions;
 using API.Options;
@@ -8,7 +7,6 @@ using API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -95,6 +93,8 @@ builder.Services.AddOptions<AppOptions>()
 builder.Services.AddScoped<IBasketService, BasketService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 

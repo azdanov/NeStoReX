@@ -9,8 +9,8 @@ import {
 } from "@reduxjs/toolkit/query/react";
 import { Mutex } from "async-mutex";
 
-import { accountApi } from "../../features/account/accountApi.ts";
-import { clearTokens } from "../../features/account/authSlice.ts";
+import { clearTokens, setTokens } from "../../features/account/authSlice.ts";
+import { TokenResponse } from "../models/account.ts";
 import { RootState } from "./store.ts";
 
 const mutex = new Mutex();
@@ -20,9 +20,9 @@ const API_URL = import.meta.env.VITE_API_URL;
 const baseQuery = fetchBaseQuery({
   baseUrl: API_URL,
   prepareHeaders: (headers, { getState }) => {
-    const token = (getState() as RootState).auth.accessToken;
-    if (token) {
-      headers.set("Authorization", `Bearer ${token}`);
+    const tokens = (getState() as RootState).auth.tokens;
+    if (tokens) {
+      headers.set("Authorization", `Bearer ${tokens.accessToken}`);
     }
     return headers;
   },
@@ -34,43 +34,40 @@ export const baseQueryWithReauth: BaseQueryFn<
   FetchBaseQueryError,
   NonNullable<unknown>,
   FetchBaseQueryMeta
-> = async (arguments_, api, extraOptions) => {
+> = async (args, api, extraOptions) => {
   await mutex.waitForUnlock();
-  let result = await baseQuery(arguments_, api, extraOptions);
+  let result = await baseQuery(args, api, extraOptions);
 
   if (result.error?.status === 401) {
     if (mutex.isLocked()) {
       await mutex.waitForUnlock();
-      return baseQuery(arguments_, api, extraOptions);
-    }
+      result = await baseQuery(args, api, extraOptions);
+    } else {
+      const release = await mutex.acquire();
 
-    const release = await mutex.acquire();
-    try {
-      const { accessToken, refreshToken } = (api.getState() as RootState).auth;
+      try {
+        const { tokens } = (api.getState() as RootState).auth;
 
-      if (
-        !accessToken ||
-        !refreshToken ||
-        result.meta?.response?.headers
-          .get("www-authenticate")
-          ?.includes("The signature is invalid")
-      ) {
-        api.dispatch(clearTokens());
-      } else if (
-        result.meta?.response?.headers
-          .get("www-authenticate")
-          ?.includes("The token expired at")
-      ) {
-        api.dispatch(
-          accountApi.endpoints.refreshToken.initiate({
-            accessToken,
-            refreshToken,
-          }),
+        // Must use baseQuery here, because mutex lock won't allow a rtk query thunk to run after a dispatch.
+        const refreshResult = await baseQuery(
+          {
+            url: "accounts/refresh-token",
+            method: "POST",
+            body: tokens,
+          },
+          api,
+          extraOptions,
         );
-        result = await baseQuery(arguments_, api, extraOptions);
+
+        if (refreshResult.data) {
+          api.dispatch(setTokens(refreshResult.data as TokenResponse));
+          result = await baseQuery(args, api, extraOptions);
+        } else {
+          api.dispatch(clearTokens());
+        }
+      } finally {
+        release();
       }
-    } finally {
-      release();
     }
   }
 

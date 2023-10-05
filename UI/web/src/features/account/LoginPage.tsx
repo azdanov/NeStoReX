@@ -11,15 +11,18 @@ import {
 import Grid from "@mui/material/Unstable_Grid2";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { Link, useLocation } from "wouter";
+import { Link, Redirect, useLocation } from "wouter";
 
 import { LoginRequest } from "../../app/models/account.ts";
 import { ErrorResponse } from "../../app/models/error.ts";
+import { useAppSelector } from "../../app/store/store.ts";
 import { useLoginUserMutation } from "./accountApi.ts";
+import { getIsAuthenticated } from "./authSlice.ts";
 
 interface FormValues extends LoginRequest {}
 
 export function LoginPage() {
+  const isAuthenticated = useAppSelector(getIsAuthenticated);
   const [loginUser] = useLoginUserMutation();
   const [_, setLocation] = useLocation();
 
@@ -40,6 +43,10 @@ export function LoginPage() {
       toast.error("Invalid username or password");
     }
   };
+
+  if (isAuthenticated) {
+    return <Redirect to="/products" />;
+  }
 
   return (
     <Container
