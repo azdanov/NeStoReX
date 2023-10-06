@@ -1,9 +1,11 @@
-import "./styles.css";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import "react-toastify/dist/ReactToastify.css";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import "./styles.css";
 
 import { Container, createTheme, ThemeProvider } from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -47,9 +49,9 @@ export function App() {
       />
       <CssBaseline enableColorScheme />
       <Header darkMode={isDarkMode} handleThemeChange={toggle} />
-      <Container>
-        <Switch>
-          <Route path="/" component={HomePage} />
+      <Switch>
+        <Route path="/" component={HomePage} />
+        <Container>
           <Route path="/products" component={ProductPage} />
           <Route path="/products/:id" component={ProductDetailsPage} />
           <Route path="/about" component={AboutPage} />
@@ -60,8 +62,8 @@ export function App() {
           <AuthRoute path="/checkout" component={CheckoutPage} />
           <AuthRoute path="/orders" component={OrdersPage} />
           <Route component={NotFound} />
-        </Switch>
-      </Container>
+        </Container>
+      </Switch>
     </ThemeProvider>
   );
 }

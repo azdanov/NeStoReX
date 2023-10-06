@@ -115,9 +115,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(options => { options.ConfigObject.AdditionalItems.Add("persistAuthorization", "true"); });
 }
 
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapFallbackToController("Index", "Fallback");
 
 app.Run();
