@@ -25,3 +25,8 @@ export interface Order {
   orderStatus: string;
   total: number;
 }
+
+export interface CreateOrderResponse {
+  orderId: number;
+  clientSecret: string;
+}

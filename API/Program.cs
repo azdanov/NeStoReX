@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Stripe;
+using ProductService = API.Services.ProductService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -81,6 +83,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
+StripeConfiguration.ApiKey = builder.Configuration.GetSection("StripeSettings")["SecretKey"];
+
 builder.Services.AddOptions<JwtSettingsOptions>()
     .BindConfiguration("JwtSettings")
     .ValidateDataAnnotations()
@@ -95,6 +99,8 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<PaymentIntentService>();
 
 var app = builder.Build();
 

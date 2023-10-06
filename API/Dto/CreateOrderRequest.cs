@@ -1,6 +1,6 @@
 ﻿namespace API.Dto;
 
-public record struct CreateOrderDto(
+public record struct CreateOrderRequest(
     bool SaveAddress,
     AddressDto Address
 );

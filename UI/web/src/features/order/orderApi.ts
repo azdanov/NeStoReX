@@ -1,4 +1,8 @@
-﻿import { CreateOrderRequest, Order } from "../../app/models/order.ts";
+﻿import {
+  CreateOrderRequest,
+  CreateOrderResponse,
+  Order,
+} from "../../app/models/order.ts";
 import { storeApi } from "../../app/store/storeApi.ts";
 
 export const orderApi = storeApi.injectEndpoints({
@@ -20,7 +24,7 @@ export const orderApi = storeApi.injectEndpoints({
       query: (id) => `orders/${id}`,
       providesTags: (_result, _error, id) => [{ type: "Order", id }],
     }),
-    createOrder: builder.mutation<Order, CreateOrderRequest>({
+    createOrder: builder.mutation<CreateOrderResponse, CreateOrderRequest>({
       query: (body) => ({
         url: "orders",
         method: "POST",

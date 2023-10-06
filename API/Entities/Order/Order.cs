@@ -6,6 +6,8 @@ public class Order
     public int UserId { get; set; }
     public User User { get; set; } = default!;
 
+    public string PaymentIntentId { get; set; } = default!;
+
     public ShippingAddress ShippingAddress { get; set; } = default!;
     public DateTimeOffset OrderDate { get; set; } = DateTimeOffset.UtcNow;
     public List<OrderItem> OrderItems { get; set; } = new();

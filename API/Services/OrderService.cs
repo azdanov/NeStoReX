@@ -33,16 +33,10 @@ public class OrderService : IOrderService
             .FirstOrDefaultAsync();
     }
 
-    public async Task<Order> CreateOrderAsync(int userId, CreateOrderDto orderDto)
+    public async Task<Order> CreateOrderAsync(int userId, CreateOrderRequest orderRequest, string paymentIntentId)
     {
         var basket = await _basketService.GetBasketAsync(userId);
-        if (basket == null)
-        {
-            throw new BadRequestException(
-                $"Basket with id {userId} does not exist",
-                new Dictionary<string, string[]> { { "basket", new[] { $"Basket with id {userId} does not exist" } } }
-            );
-        }
+        if (basket == null) throw new NotFoundException("Basket", userId.ToString());
 
         var items = new List<OrderItem>();
         foreach (var item in basket.Items)
@@ -66,10 +60,11 @@ public class OrderService : IOrderService
         var order = new Order
         {
             OrderItems = items,
-            ShippingAddress = orderDto.Address.MapToShippingAddress(),
+            ShippingAddress = orderRequest.Address.MapToShippingAddress(),
             Subtotal = items.Sum(item => item.Price * item.Quantity),
             DeliveryFee = items.Sum(item => item.Price * item.Quantity) > 10000 ? 0 : 500,
-            UserId = userId
+            UserId = userId,
+            PaymentIntentId = paymentIntentId
         };
 
         basket.Items.Clear();
