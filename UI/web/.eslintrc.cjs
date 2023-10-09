@@ -61,6 +61,7 @@ module.exports = {
     "unused-imports/no-unused-imports": "error",
     "react/no-unescaped-entities": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
+    "unicorn/no-null": "off",
     "unused-imports/no-unused-vars": [
       "warn",
       {
